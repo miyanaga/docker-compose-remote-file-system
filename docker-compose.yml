@@ -1,0 +1,47 @@
+version: "3"
+services:
+  sftp-without-key:
+    image: atmoz/sftp
+    volumes:
+      - ./remote:/home/sftp-without-key/remote
+    ports:
+      - "10220:22"
+    command: sftp-without-key:pass:1001
+  sftp-with-rsa-key:
+    image: atmoz/sftp
+    volumes:
+      - ./remote:/home/sftp-with-rsa-key/remote
+      - ./ssh/id_rsa.pub:/home/sftp-with-rsa-key/.ssh/keys/id_rsa.pub:ro
+    ports:
+      - "10221:22"
+    command: sftp-with-rsa-key::1001
+  sftp-with-ed25519-key:
+    image: atmoz/sftp
+    volumes:
+      - ./remote:/home/sftp-with-ed25519-key/remote
+      - ./ssh/id_ed25519.pub:/home/sftp-with-ed25519-key/.ssh/keys/id_ed25519.pub:ro
+    ports:
+      - "10222:22"
+    command: sftp-with-ed25519-key::1001
+  ftp:
+    image: wildscamp/vsftpd
+    volumes:
+      - ./remote:/home/virtual/ftp/remote
+    environment:
+      VSFTPD_USER_1: "ftp:pass:1001:"
+      PASV_MIN_PORT: 30100
+      PASV_MAX_PORT: 30109
+    ports:
+      - "10210:21"
+      - "30100-30109:30100-30109"
+  ftps:
+    image: phpstorm/ftps
+    volumes:
+      - ./remote:/home/virtual/ftps/remote
+    environment:
+      VSFTPD_USER_1: "ftps:pass:1001:"
+      PASV_MIN_PORT: 30110
+      PASV_MAX_PORT: 30119
+    ports:
+      - "10211:21"
+      - "30110-30119:30110-30119"
